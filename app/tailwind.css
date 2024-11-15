@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "AgenorNeue-Regular";
+  src: url("public\font\AgenorNeue-Regular.otf") format("otf");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Identidad-ExtraBold";
+  src: url("public\font\Identidad-ExtraBold.otf") format("otf");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@layer base {
+  body {
+    @apply bg-grey-100 text-grey-400 p-12 font-body;
+  }
+
+  h1 {
+    @apply font-header text-3xl font-bold;
+  }
+  h2 {
+    @apply font-header text-2xl font-bold;
+  }
+  h3 {
+    @apply font-header text-xl font-bold;
+  }
+  h4 {
+    @apply font-header text-lg font-bold;
+  }
+}
+
+@layer components {
+  .main-container {
+    @apply flex mx-auto my-0 max-w-screen-2xl;
+  }
+  .comparison-table {
+    @apply w-1/2 h-32 table-fixed border-2 rounded-lg border-grey-200;
+  }
+  .table-item-grey {
+    @apply bg-grey-200;
+  }
+  .positive-item {
+    @apply bg-green text-green-dark;
+  }
+  .neg-item {
+    @apply bg-red text-red-dark;
+  }
+  .difference {
+    @apply bg-yellow text-darkyellow;
+  }
+  .budget-envelope {
+    @apply bg-white w-1/4 h-12;
+  }
+  .envelope-container-title {
+    @apply text-center w-full bg-slate-500 row-span-2;
+  }
+  .envelope-container {
+    @apply grid grid-cols-3;
+  }
+  .envelope {
+    @apply w-48 h-20 bg-pink cursor-pointer;
+  }
+  .modal-bg {
+    @apply fixed inset-0 flex items-center justify-center z-50;
+  }
+  .modal-backdrop {
+    @apply fixed inset-0 bg-black opacity-50;
+  }
+  .modal-main {
+    @apply relative w-1/3 h-1/2 mx-auto p-6 bg-white rounded-lg shadow-md z-10;
+  }
+  .envelopes-summary {
+    @apply grid grow grid-cols-3 max-w-full mx-auto place-content-evenly;
+  }
+  .summary-envelope {
+    @apply w-96 max-h-60 bg-slate-200 p-4 m-4 rounded outline outline-cyan-950 drop-shadow-md;
+  }
+  .button {
+    @apply px-4 py-2 bg-red-alt rounded-lg drop-shadow ring-1 ring-grey-400
+   hover:bg-pink hover:duration-75
+  }
+}
+
+@layer utilities {
+}
