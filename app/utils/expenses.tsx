@@ -1,9 +1,15 @@
-import { getLocalExpenses, getLocalIncome, getEnvelopes } from "./localStorage";
+import { getEnvelopes } from "./localStorage";
 
-export function getFormattedDate(date = new Date(), format = "yyyy-MM-dd") {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
+export function getFormattedDate(date: string | Date = new Date(), format = "yyyy-MM-dd") {
+  const validDate = typeof date === "string" ? new Date(date) : date;
+
+  if (isNaN(validDate.getTime())) {
+    throw new Error("Invalid date provided.");
+  }
+
+  const year = validDate.getFullYear();
+  const month = String(validDate.getMonth() + 1).padStart(2, "0");
+  const day = String(validDate.getDate()).padStart(2, "0");
 
   switch (format) {
     case "yyyy-MM":
@@ -14,6 +20,14 @@ export function getFormattedDate(date = new Date(), format = "yyyy-MM-dd") {
       return `${year}-${month}-${day}`;
   }
 }
+
+
+export const formatCurrency = (amount: number, locale: string = "en-US", currency: string = "USD") => {
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: currency,
+  }).format(amount);
+};
 
 export function calculateTotal(data, type, timePeriod) {
   if (!Array.isArray(data)) return 0;
@@ -40,53 +54,65 @@ export function calculateTotal(data, type, timePeriod) {
     .reduce((total, item) => total + (item.amount || 0), 0);
 }
 
-export function getMonthlyExpenditureDetails(incomes, expenses, envelopes) {
-  const incomeTotals = calculateTotal(incomes, "income", "thisMonth");
-  const expenseTotals = calculateTotal(expenses, "expense", "thisMonth");
-  let totalIncomeThisMonth = 0;
-  let totalIncomeLastMonth = 0;
-  let totalSpendingThisMonth = 0;
-  let totalSpendingLastMonth = 0;
+export function getMonthlyExpenditureDetails(incomes, expenses) {
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth();
+  const currentYear = currentDate.getFullYear();
 
-  const currentMonth = getFormattedDate(new Date(), "yyyy-MM");
-  const lastMonthDate = new Date();
+  const lastMonthDate = new Date(currentDate);
   lastMonthDate.setMonth(lastMonthDate.getMonth() - 1);
-  const lastMonth = getFormattedDate(lastMonthDate, "yyyy-MM");
+  const lastMonth = lastMonthDate.getMonth();
+  const lastYear = lastMonthDate.getFullYear();
 
-  expenses.forEach((expense) => {
-    const expenseMonth = expense.date.slice(0, 7);
-    if (expenseMonth === currentMonth) {
-      totalSpendingThisMonth += expense.amount;
-    } else if (expenseMonth === lastMonth) {
-      totalSpendingLastMonth += expense.amount;
-    }
-  });
+  const filterByMonth = (data, month, year) =>
+    data.filter((item) => {
+      const itemDate = new Date(item.date);
+      return (
+        itemDate.getMonth() === month && itemDate.getFullYear() === year
+      );
+    });
 
-  incomes.forEach((income) => {
-    const incomeMonth = income.date.slice(0, 7);
-    if (incomeMonth === currentMonth) {
-      totalIncomeThisMonth += income.amount;
-    } else if (incomeMonth === lastMonth) {
-      totalIncomeLastMonth += income.amount;
-    }
-  });
+  const thisMonthExpenses = filterByMonth(expenses, currentMonth, currentYear);
+  const lastMonthExpenses = filterByMonth(expenses, lastMonth, lastYear);
+  const thisMonthIncomes = filterByMonth(incomes, currentMonth, currentYear);
+  const lastMonthIncomes = filterByMonth(incomes, lastMonth, lastYear);
 
-  const spendingDifference = incomeTotals - expenseTotals;
+  const totalSpendingThisMonth = thisMonthExpenses.reduce(
+    (sum, expense) => sum + (expense.amount || 0),
+    0
+  );
+  const totalSpendingLastMonth = lastMonthExpenses.reduce(
+    (sum, expense) => sum + (expense.amount || 0),
+    0
+  );
+  const totalIncomeThisMonth = thisMonthIncomes.reduce(
+    (sum, income) => sum + (income.amount || 0),
+    0
+  );
+  const totalIncomeLastMonth = lastMonthIncomes.reduce(
+    (sum, income) => sum + (income.amount || 0),
+    0
+  );
 
-  const mostSpentEnvelope = expenses.reduce((acc, expense) => {
+  const spendingDifference = totalIncomeThisMonth - totalSpendingThisMonth;
+
+  const mostSpentEnvelope = thisMonthExpenses.reduce((acc, expense) => {
     if (expense.envelope) {
-      if (!acc[expense.envelope]) {
-        acc[expense.envelope] = 0;
-      }
-      acc[expense.envelope] += expense.amount;
-    } else {
-      console.warn("Expense without envelope found:", expense);
+      acc[expense.envelope] = (acc[expense.envelope] || 0) + expense.amount;
     }
     return acc;
   }, {});
-  const [highestEnvelope, highestAmount] = Object.entries(
-    mostSpentEnvelope
-  ).sort((a, b) => b[1] - a[1])[0];
+  const [highestEnvelope, highestAmount] =
+    Object.entries(mostSpentEnvelope).sort((a, b) => b[1] - a[1])[0] || [];
+
+  const mostFrequentEnvelope = thisMonthExpenses.reduce((acc, expense) => {
+    if (expense.envelope) {
+      acc[expense.envelope] = (acc[expense.envelope] || 0) + 1;
+    }
+    return acc;
+  }, {});
+  const [frequentEnvelope] =
+    Object.entries(mostFrequentEnvelope).sort((a, b) => b[1] - a[1])[0] || [];
 
   const spendingComparison =
     totalSpendingLastMonth === 0
@@ -95,20 +121,56 @@ export function getMonthlyExpenditureDetails(incomes, expenses, envelopes) {
           totalSpendingLastMonth) *
         100;
 
-  const mostFrequentEnvelope = expenses.reduce((acc, expense) => {
-    acc[expense.envelope] = (acc[expense.envelope] || 0) + 1;
-    return acc;
-  }, {});
+  return {
+    incomeTotals: totalIncomeThisMonth,
+    expenseTotals: totalSpendingThisMonth,
+    spendingDifference,
+    spendingComparison,
+    highestEnvelope: highestEnvelope || "N/A",
+    highestAmount: highestAmount || 0,
+    frequentEnvelope: frequentEnvelope || "N/A",
+  };
+}
+
+export function getYearlyExpenditureDetails(incomes, expenses, year) {
+  const incomeTotals = incomes
+    .filter((income) => new Date(income.date).getFullYear() === year)
+    .reduce((total, income) => total + income.amount, 0);
+
+  const expenseTotals = expenses
+    .filter((expense) => new Date(expense.date).getFullYear() === year)
+    .reduce((total, expense) => total + expense.amount, 0);
+
+  const spendingDifference = incomeTotals - expenseTotals;
+
+  const mostSpentEnvelope = expenses
+    .filter((expense) => new Date(expense.date).getFullYear() === year)
+    .reduce((acc, expense) => {
+      if (expense.envelope) {
+        acc[expense.envelope] = (acc[expense.envelope] || 0) + expense.amount;
+      }
+      return acc;
+    }, {});
+
+  const [highestEnvelope, highestAmount] = Object.entries(
+    mostSpentEnvelope
+  ).sort((a, b) => b[1] - a[1])[0] || [null, 0];
+
+  const mostFrequentEnvelope = expenses
+    .filter((expense) => new Date(expense.date).getFullYear() === year)
+    .reduce((acc, expense) => {
+      acc[expense.envelope] = (acc[expense.envelope] || 0) + 1;
+      return acc;
+    }, {});
 
   const [frequentEnvelope] = Object.entries(mostFrequentEnvelope).sort(
     (a, b) => b[1] - a[1]
-  )[0];
+  )[0] || [null, 0];
 
   return {
     incomeTotals,
     expenseTotals,
     spendingDifference,
-    spendingComparison,
     highestEnvelope,
     highestAmount,
     frequentEnvelope,
@@ -133,3 +195,51 @@ export const totalSpend = (envelope) => {
   }
   return amount;
 };
+
+export function filterEnvelopeExpenses(envelopes, criteria = {}) {
+  const { month, year, minAmount, maxAmount, envelopeName } = criteria;
+
+  return envelopes
+    .filter((envelope) => {
+      // Filter by envelope name (optional)
+      if (envelopeName && envelope.title !== envelopeName) return false;
+      return true;
+    })
+    .map((envelope) => {
+      // Filter expenses within the envelope
+      const filteredExpenses = envelope.expenses.filter((expense) => {
+        const expenseDate = new Date(expense.date);
+
+        // Filter by month and year
+        const matchesMonth =
+          month !== undefined ? expenseDate.getMonth() + 1 === month : true;
+        const matchesYear =
+          year !== undefined ? expenseDate.getFullYear() === year : true;
+
+        // Filter by amount range
+        const matchesMinAmount =
+          minAmount !== undefined ? expense.amount >= minAmount : true;
+        const matchesMaxAmount =
+          maxAmount !== undefined ? expense.amount <= maxAmount : true;
+
+        return matchesMonth && matchesYear && matchesMinAmount && matchesMaxAmount;
+      });
+
+      return { ...envelope, expenses: filteredExpenses };
+    })
+    .filter((envelope) => envelope.expenses.length > 0); // Remove envelopes with no matching expenses
+}
+
+export function filterCurrentMonthExpenses(expenses) {
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth(); // 0-indexed (0 = January)
+  const currentYear = currentDate.getFullYear();
+
+  return expenses.filter((expense) => {
+    const expenseDate = new Date(expense.date);
+    return (
+      expenseDate.getMonth() === currentMonth &&
+      expenseDate.getFullYear() === currentYear
+    );
+  });
+}

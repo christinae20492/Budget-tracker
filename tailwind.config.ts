@@ -19,7 +19,12 @@ export default {
           event: "#91edcb",
         },
 
-        red: { DEFAULT: "#ad3d3d", light: "#DB6A6A", dark: "#21161c", alt:'#9D5858' },
+        red: {
+          DEFAULT: "#ad3d3d",
+          light: "#DB6A6A",
+          dark: "#21161c",
+          alt: "#9D5858",
+        },
 
         blue: {
           DEFAULT: "#52808D",

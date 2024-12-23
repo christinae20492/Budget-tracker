@@ -3,6 +3,7 @@ import { json } from "@remix-run/node";
 import type { LoaderFunction } from "@remix-run/node";
 import { getEnvelopes, getLocalExpenses } from "~/utils/localStorage";
 import {
+  filterCurrentMonthExpenses,
   getBudgetLimits,
   getFormattedDate,
   totalSpend,
@@ -28,28 +29,34 @@ export default function EnvelopesPage() {
 
   const fetchData = async () => {
     const currentEnvelopes = await getEnvelopes();
-    setEnvelopes(currentEnvelopes);
+    const filteredEnvelopes = currentEnvelopes.map((env) => ({
+      ...env,
+      expenses: filterCurrentMonthExpenses(env.expenses || []),
+    }));
+    setEnvelopes(filteredEnvelopes);
   };
 
   useEffect(() => {
-    const initializeData = async () => {
-      await fetchData();
-      envelopes.forEach((envelope) => calculateRemainingBudget(envelope));
-    };
+  const initializeData = async () => {
+    await fetchData();
+    envelopes.forEach((envelope) => calculateRemainingBudget(envelope));
+  };
 
-    initializeData();
-  }, []);
+  initializeData();
+}, []);
+
   const { expenses } = useLoaderData();
 
   function calculateTotalSpentToday() {
-    const expenses = getLocalExpenses();
+    const expenses = filterCurrentMonthExpenses(getLocalExpenses());
     const today = getFormattedDate();
     const total = expenses
       .filter((expense) => expense.date === today)
       .reduce((total, expense) => total + expense.amount, 0);
-
+  
     return total;
   }
+  
 
   const goToDetails = (env) => {
     const name = env.title;

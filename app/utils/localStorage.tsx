@@ -87,3 +87,15 @@ export function createEnvelope(envelope: Envelope): void {
   envelopes.push(envelope);
   localStorage.setItem("envelopes", JSON.stringify(envelopes));
 }
+
+export const deleteExpense = async (id) => {
+  const expenses = getLocalExpenses();
+  const updatedExpenses = expenses.filter((exp) => exp.id !== id);
+  localStorage.setItem("expenses", JSON.stringify(updatedExpenses));
+};
+
+export const deleteIncome = async (id) => {
+  const incomes = getLocalIncome();
+  const updatedIncomes = incomes.filter((inc) => inc.id !== id);
+  localStorage.setItem("incomes", JSON.stringify(updatedIncomes));
+};
