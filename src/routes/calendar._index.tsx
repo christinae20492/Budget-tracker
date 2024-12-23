@@ -5,15 +5,15 @@ import { useState, useEffect, useMemo } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import ExpenseModal from "~/components/ui/ExpenseModal";
-import FloatingMenu from "~/components/ui/FloatingMenu";
+import ExpenseModal from "src/components/ui/ExpenseModal";
+import FloatingMenu from "src/components/ui/FloatingMenu";
 import {
   getLocalExpenses,
   Expense,
   getLocalIncome,
   Income,
-} from "~/utils/localStorage";
-import ToggleSwitch from "~/components/ui/ToggleSwitch";
+} from "src/utils/localStorage";
+import ToggleSwitch from "src/components/ui/ToggleSwitch";
 
 export const meta: MetaFunction = () => {
   return [

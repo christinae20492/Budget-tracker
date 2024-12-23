@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import Layout from "~/components/ui/Layout";
-import { getMonthlyExpenditureDetails, totalSpend } from "~/utils/expenses";
+import Layout from "src/components/ui/Layout";
+import { getMonthlyExpenditureDetails, totalSpend } from "src/utils/expenses";
 import {
   getEnvelopes,
   getLocalExpenses,
   getLocalIncome,
-} from "~/utils/localStorage";
-import { filterCurrentMonthExpenses } from "~/utils/expenses"; // Utility for filtering
-import { warnToast } from "~/utils/toast";
+} from "src/utils/localStorage";
+import { filterCurrentMonthExpenses } from "src/utils/expenses"; // Utility for filtering
+import { warnToast } from "src/utils/toast";
 import { Link } from "@remix-run/react";
 
 export default function MonthlySummary() {

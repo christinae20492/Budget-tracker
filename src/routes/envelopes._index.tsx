@@ -1,17 +1,17 @@
 import { useLoaderData, useNavigate } from "@remix-run/react";
 import { json } from "@remix-run/node";
 import type { LoaderFunction } from "@remix-run/node";
-import { getEnvelopes, getLocalExpenses } from "~/utils/localStorage";
+import { getEnvelopes, getLocalExpenses } from "src/utils/localStorage";
 import {
   filterCurrentMonthExpenses,
   getBudgetLimits,
   getFormattedDate,
   totalSpend,
-} from "~/utils/expenses";
-import { warnToast } from "~/utils/toast";
-import Layout from "~/components/ui/Layout";
+} from "src/utils/expenses";
+import { warnToast } from "src/utils/toast";
+import Layout from "src/components/ui/Layout";
 import { useEffect, useState } from "react";
-import AddEnvelope from "~/components/ui/EnvelopeModal";
+import AddEnvelope from "src/components/ui/EnvelopeModal";
 
 export const loader: LoaderFunction = async () => {
   const expenses = await getLocalExpenses();

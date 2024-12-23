@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { createEnvelope, Envelope } from "~/utils/localStorage";
-import { successToast, warnToast } from "~/utils/toast";
+import { createEnvelope, Envelope } from "src/utils/localStorage";
+import { successToast, warnToast } from "src/utils/toast";
 
 interface EnvelopeModalProps {
   onClose: () => void;

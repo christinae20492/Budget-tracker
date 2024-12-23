@@ -1,9 +1,9 @@
 import { MetaFunction, useLoaderData } from "@remix-run/react";
 import { json, LoaderFunction } from "@remix-run/node";
-import { getEnvelopes } from "~/utils/localStorage";
-import Layout from "~/components/ui/Layout";
+import { getEnvelopes } from "src/utils/localStorage";
+import Layout from "src/components/ui/Layout";
 import { useEffect, useState } from "react";
-import { warnToast } from "~/utils/toast";
+import { warnToast } from "src/utils/toast";
 
 export const meta: MetaFunction = ({ name }) => {
   return [

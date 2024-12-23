@@ -1,16 +1,16 @@
 import type { MetaFunction } from "@remix-run/node";
-import Layout from "~/components/ui/Layout";
+import Layout from "src/components/ui/Layout";
 import {
   calculateTotal,
   getMonthlyExpenditureDetails,
-} from "~/utils/expenses";
+} from "src/utils/expenses";
 import {
   Expense,
   getEnvelopes,
   getLocalExpenses,
   getLocalIncome,
   Income,
-} from "~/utils/localStorage";
+} from "src/utils/localStorage";
 import { Doughnut } from "react-chartjs-2";
 import { useEffect, useRef, useState } from "react";
 import Chart from "chart.js/auto";

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { MetaFunction, useNavigate, useSearchParams } from "@remix-run/react";
-import { addLocalIncome, generateIncomeId, Income } from "~/utils/localStorage";
-import { successToast, failToast, warnToast } from "~/utils/toast";
+import { addLocalIncome, generateIncomeId, Income } from "src/utils/localStorage";
+import { successToast, failToast, warnToast } from "src/utils/toast";
 
 export const meta: MetaFunction = () => {
   return [

@@ -1,6 +1,6 @@
 import { MetaFunction, useParams, useLoaderData } from "@remix-run/react";
 import { json, LoaderFunction } from "@remix-run/node";
-import { getLocalExpenses, getLocalIncome } from "~/utils/localStorage";
+import { getLocalExpenses, getLocalIncome } from "src/utils/localStorage";
 
 export const meta: MetaFunction = () => {
   return [

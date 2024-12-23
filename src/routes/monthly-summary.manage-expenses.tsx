@@ -1,7 +1,7 @@
 import { useState } from "react";
-import Layout from "~/components/ui/Layout";
-import { getLocalExpenses, getLocalIncome, deleteExpense, deleteIncome } from "~/utils/localStorage";
-import { formatCurrency, getFormattedDate } from "~/utils/expenses";
+import Layout from "src/components/ui/Layout";
+import { getLocalExpenses, getLocalIncome, deleteExpense, deleteIncome } from "src/utils/localStorage";
+import { formatCurrency, getFormattedDate } from "src/utils/expenses";
 
 export default function ManageExpenses() {
   const [expenses, setExpenses] = useState(getLocalExpenses());

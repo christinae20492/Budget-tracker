@@ -7,8 +7,8 @@ import {
   addExpensetoEnvelope,
   Expense,
   getEnvelopes,
-} from "~/utils/localStorage";
-import { successToast, warnToast } from "~/utils/toast";
+} from "src/utils/localStorage";
+import { successToast, warnToast } from "src/utils/toast";
 
 export const meta: MetaFunction = () => {
   return [

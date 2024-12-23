@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import Layout from "~/components/ui/Layout";
-import { getYearlyExpenditureDetails } from "~/utils/expenses";
+import Layout from "src/components/ui/Layout";
+import { getYearlyExpenditureDetails } from "src/utils/expenses";
 import {
   getLocalExpenses,
   getLocalIncome,
-} from "~/utils/localStorage";
+} from "src/utils/localStorage";
 
 export default function YearlySummary() {
   const [summary, setSummary] = useState(null);
