@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { createEnvelope, Envelope } from "~/utils/localStorage";
+import { createEnvelope, Envelope, getEnvelopes } from "~/utils/localStorage";
 import { successToast, warnToast } from "~/utils/toast";
+import { envelopeColorsList } from "~/utils/colors";
 
 interface EnvelopeModalProps {
   onClose: () => void;
@@ -10,6 +11,17 @@ export default function AddEnvelope({ onClose }: EnvelopeModalProps) {
   const [title, setTitle] = useState("");
   const [fixed, setFixed] = useState("");
   const [budget, setBudget] = useState<number>(0);
+ const [comments, setComments] = useState("");
+  const envelopes = getEnvelopes();
+
+  const pickEnvelopeColor = (): string =>{
+    for (const color of envelopeColorsList) {
+      const isColorInUse = envelopes.some((envelope) => envelope.color === color);
+      if (!isColorInUse) {
+        return color;
+      }
+    }
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,12 +39,16 @@ export default function AddEnvelope({ onClose }: EnvelopeModalProps) {
       }
     };
 
+   const assignedColor = pickEnvelopeColor();
+
     const newEnvelope: Envelope = {
       title,
       fixed: isFixed(),
       expenses: [],
       icon: "",
       budget,
+      color:assignedColor,
+      comments,
     };
 
     createEnvelope(newEnvelope);
@@ -106,6 +122,21 @@ export default function AddEnvelope({ onClose }: EnvelopeModalProps) {
               step="0.01"
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
             />
+          </div>
+
+          <div>
+            <label
+            htmlFor="amount"
+            className="block text-sm font-medium text-gray-700">
+              Comments?
+            </label>
+            <input 
+            type="text"
+            id="comments"
+            name="comments"
+            value={comments}
+            onChange={(e) => setComments(e.target.value)}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"/>
           </div>
 
           <div className="text-center">

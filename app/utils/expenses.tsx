@@ -1,15 +1,11 @@
 import { getEnvelopes } from "./localStorage";
 
 export function getFormattedDate(date: string | Date = new Date(), format = "yyyy-MM-dd") {
-  const validDate = typeof date === "string" ? new Date(date) : date;
+  if (typeof date === "string") return date;
 
-  if (isNaN(validDate.getTime())) {
-    throw new Error("Invalid date provided.");
-  }
-
-  const year = validDate.getFullYear();
-  const month = String(validDate.getMonth() + 1).padStart(2, "0");
-  const day = String(validDate.getDate()).padStart(2, "0");
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
 
   switch (format) {
     case "yyyy-MM":
@@ -66,11 +62,10 @@ export function getMonthlyExpenditureDetails(incomes, expenses) {
 
   const filterByMonth = (data, month, year) =>
     data.filter((item) => {
-      const itemDate = new Date(item.date);
-      return (
-        itemDate.getMonth() === month && itemDate.getFullYear() === year
-      );
+      const [itemYear, itemMonth] = item.date.split("-").map(Number);
+      return itemMonth - 1 === month && itemYear === year;
     });
+  
 
   const thisMonthExpenses = filterByMonth(expenses, currentMonth, currentYear);
   const lastMonthExpenses = filterByMonth(expenses, lastMonth, lastYear);
@@ -121,6 +116,15 @@ export function getMonthlyExpenditureDetails(incomes, expenses) {
           totalSpendingLastMonth) *
         100;
 
+  const mostSpentLocation = thisMonthExpenses.reduce((acc, expense) => {
+    if (expense.location) {
+      acc[expense.location] = (acc[expense.location] || 0) + expense.amount;
+    }
+    return acc;
+  }, {});
+  const [highestSpendingLocation, highestSpendingAmount] =
+    Object.entries(mostSpentLocation).sort((a, b) => b[1] - a[1])[0] || [];
+
   return {
     incomeTotals: totalIncomeThisMonth,
     expenseTotals: totalSpendingThisMonth,
@@ -129,6 +133,8 @@ export function getMonthlyExpenditureDetails(incomes, expenses) {
     highestEnvelope: highestEnvelope || "N/A",
     highestAmount: highestAmount || 0,
     frequentEnvelope: frequentEnvelope || "N/A",
+    highestSpendingLocation: highestSpendingLocation || "N/A",
+    highestSpendingAmount: highestSpendingAmount || 0,
   };
 }
 
@@ -193,7 +199,7 @@ export const totalSpend = (envelope) => {
   for (let i = 0; i < envelope.expenses.length; i++) {
     amount += envelope.expenses[i].amount;
   }
-  return amount;
+  return amount.toFixed(2);
 };
 
 export function filterEnvelopeExpenses(envelopes, criteria = {}) {
@@ -227,19 +233,16 @@ export function filterEnvelopeExpenses(envelopes, criteria = {}) {
 
       return { ...envelope, expenses: filteredExpenses };
     })
-    .filter((envelope) => envelope.expenses.length > 0); // Remove envelopes with no matching expenses
+    .filter((envelope) => envelope.expenses.length > 0);
 }
 
 export function filterCurrentMonthExpenses(expenses) {
   const currentDate = new Date();
-  const currentMonth = currentDate.getMonth(); // 0-indexed (0 = January)
+  const currentMonth = currentDate.getMonth() + 1;
   const currentYear = currentDate.getFullYear();
 
   return expenses.filter((expense) => {
-    const expenseDate = new Date(expense.date);
-    return (
-      expenseDate.getMonth() === currentMonth &&
-      expenseDate.getFullYear() === currentYear
-    );
+    const [year, month] = expense.date.split("-").map(Number);
+    return year === currentYear && month === currentMonth;
   });
 }

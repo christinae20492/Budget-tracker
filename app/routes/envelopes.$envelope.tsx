@@ -74,7 +74,7 @@ export default function EnvelopeDetails() {
     <Layout>
       <h1 className="text-center">{envelope.title}'s Details</h1>
       <p>Budget: ${envelope.budget}</p>
-      <p>Total Spent: ${totalSpent}</p>
+      <p>Total Spent: ${totalSpent.toFixed(2)}</p>
 
       <ul>
         {expenses.map((expense, index) => (

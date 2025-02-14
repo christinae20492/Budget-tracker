@@ -18,7 +18,8 @@
 
 @layer base {
   body {
-    @apply bg-grey-100 text-grey-400 p-12 font-body;
+    @apply bg-grey-100 text-grey-400 p-12 font-body
+    dark:bg-black dark:text-white;
   }
 
   h1 {
@@ -37,10 +38,16 @@
 
 @layer components {
   .main-container {
-    @apply flex mx-auto my-0 max-w-screen-2xl;
+    @apply p-6 border border-gray-500 rounded-lg shadow-md mt-4 min-h-lvh max-w-screen-2xl mx-auto bg-white
+    dark:bg-grey-500 dark:border-white;
+  }
+  .floating-menu {
+    @apply float-left bg-white min-w-72 h-8 rounded-xl border border-gray-400 shadow-md absolute top-4 left-4 clear-both content-center
+    dark:bg-grey-300 dark:text-black;
+
   }
   .comparison-table {
-    @apply w-1/2 h-32 table-fixed border-2 rounded-lg border-grey-200;
+    @apply w-1/2 h-32 table-fixed border-2 rounded-2xl border-grey-200;
   }
   .table-item-grey {
     @apply bg-grey-200;
@@ -58,13 +65,23 @@
     @apply bg-white w-1/4 h-12;
   }
   .envelope-container-title {
-    @apply text-center w-full bg-slate-500 row-span-2;
+    @apply text-center w-full bg-green-sea p-4 rounded border-gray-500 border-2;
   }
   .envelope-container {
-    @apply grid grid-cols-3;
+    @apply block;
+  }
+  .envelope-grid {
+    @apply grid grid-cols-4;
   }
   .envelope {
-    @apply w-48 h-20 bg-pink cursor-pointer;
+    @apply max-w-60 min-h-24 max-h-36 my-3 bg-pink/10 cursor-pointer mx-auto border-grey-600 border-2 rounded-md shadow-md text-balance
+    hover:border-pink hover:shadow-lg transition;
+  }
+  .envelope-title-text {
+    @apply font-semibold text-xl;
+  }
+  .envelope-body-text {
+    @apply text-grey-600 my-auto;
   }
   .modal-bg {
     @apply fixed inset-0 flex items-center justify-center z-50;
@@ -76,10 +93,11 @@
     @apply relative w-1/3 h-1/2 mx-auto p-6 bg-white rounded-lg shadow-md z-10;
   }
   .envelopes-summary {
-    @apply grid grow grid-cols-3 max-w-full mx-auto place-content-evenly;
+    @apply grid grow grid-cols-3 max-w-full mx-auto place-content-evenly overflow-x-auto;
   }
   .summary-envelope {
-    @apply w-96 max-h-60 bg-slate-200 p-4 m-4 rounded outline outline-cyan-950 drop-shadow-md;
+    @apply w-96 max-h-60 bg-slate-200 p-4 m-4 rounded outline outline-cyan-950 drop-shadow-md
+    dark:bg-grey-600 dark:outline-cyan-300;
   }
   .button {
     @apply px-4 py-2 bg-red-alt rounded-lg drop-shadow ring-1 ring-grey-400

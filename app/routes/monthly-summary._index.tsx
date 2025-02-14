@@ -6,7 +6,7 @@ import {
   getLocalExpenses,
   getLocalIncome,
 } from "~/utils/localStorage";
-import { filterCurrentMonthExpenses } from "~/utils/expenses"; // Utility for filtering
+import { filterCurrentMonthExpenses } from "~/utils/expenses";
 import { warnToast } from "~/utils/toast";
 import { Link } from "@remix-run/react";
 
@@ -46,8 +46,19 @@ export default function MonthlySummary() {
       currentEnvelopes.forEach((env) => {
         const totalSpent = totalSpend(env);
         const isOverBudget = env.fixed && totalSpent > env.budget;
-        const isCloseToBudget = env.fixed && env.budget - totalSpent <= 30;
-
+  
+        // Dynamic threshold based on budget size
+        let threshold;
+        if (env.budget <= 50) {
+          threshold = env.budget * 0.5; // 50% warning
+        } else if (env.budget <= 200) {
+          threshold = env.budget * 0.75; // 75% warning
+        } else {
+          threshold = env.budget * 0.9; // 90% warning
+        }
+  
+        const isCloseToBudget = env.fixed && totalSpent >= threshold;
+  
         if (!triggeredEnvelopes.has(env.title)) {
           if (isOverBudget) {
             warnToast(`${env.title}'s budget has been exceeded for this month!`);
@@ -60,6 +71,7 @@ export default function MonthlySummary() {
       });
     }
   }, [currentEnvelopes, triggeredEnvelopes]);
+  
 
   useEffect(() => {
     if (
@@ -83,19 +95,19 @@ export default function MonthlySummary() {
   return (
     <Layout>
       <h1 className="text-center">Monthly Summary</h1>
-      <h3 className="text-right p-3 text-green-dark hover:text-green"><Link to={"/monthly-summary/year-review"}>View the Year</Link></h3>
-      <h3 className="text-right p-3 text-green-dark hover:text-green"><Link to={"/monthly-summary/manage-expenses"}>Manage Expenses</Link></h3>
+      <h3 className="text-right p-3 text-green-dark dark:text-black hover:text-green"><Link to={"/monthly-summary/year-review"}>View the Year</Link></h3>
       <div>
-        <p>Total Income: ${summary?.incomeTotals ?? 0}</p>
-        <p>Total Spending: ${summary?.expenseTotals ?? 0}</p>
-        <p>Net Savings: ${summary?.spendingDifference ?? 0}</p>
-        <p>Spending Compared to Last Month: ${summary?.spendingComparison ?? 0}</p>
+        <p>Total Income: ${summary?.incomeTotals.toFixed(2) ?? 0}</p>
+        <p>Total Spending: ${summary?.expenseTotals.toFixed(2) ?? 0}</p>
+        <p>Net Savings: ${summary?.spendingDifference.toFixed(2) ?? 0}</p>
+        <p>Spending Compared to Last Month: ${summary?.spendingComparison.toFixed(2) ?? 0}</p>
       </div>
       <p>
-        Category with Highest Spending: {summary?.highestEnvelope} - $
-        {summary?.highestAmount}
+        Category with Highest Spending: {summary?.highestEnvelope} with $
+        {summary?.highestAmount.toFixed(2)}
       </p>
       <p>Most Frequent Purchases Category: {summary?.frequentEnvelope}</p>
+      <p>Location w Highest Spending: {summary?.highestSpendingLocation} with ${summary?.highestSpendingAmount.toFixed(2)}</p>
 
       <h2 className="text-center mt-4">Envelope Budgets</h2>
       <div className="envelopes-summary">

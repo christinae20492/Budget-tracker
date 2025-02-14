@@ -2,6 +2,7 @@ import type { Config } from "tailwindcss";
 
 export default {
   content: ["./app/**/{**,.client,.server}/**/*.{js,jsx,ts,tsx}"],
+  darkMode: 'selector',
   theme: {
     extend: {
       colors: {
@@ -10,12 +11,15 @@ export default {
           200: "#a3a3a3",
           300: "#757575",
           400: "#141414",
+          500: "#353535",
+          600: "#161616"
         },
 
         green: {
           DEFAULT: "#86bd75",
           dark: "#1e2d3b",
           mint: "#caedd3",
+          sea: "#32EE90",
           event: "#91edcb",
         },
 
@@ -32,7 +36,7 @@ export default {
           dark: "#243439",
         },
 
-        pink: "#FFC5D7",
+        pink: "#CC8A94",
         yellow: "#bdb775",
         darkyellow: "#1c1c18",
       },

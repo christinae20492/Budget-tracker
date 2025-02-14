@@ -1,6 +1,7 @@
 import { useLoaderData, useNavigate } from "@remix-run/react";
 import { json } from "@remix-run/node";
 import type { LoaderFunction } from "@remix-run/node";
+import PieChart from "~/components/ui/PieChart";
 import { getEnvelopes, getLocalExpenses } from "~/utils/localStorage";
 import {
   filterCurrentMonthExpenses,
@@ -37,13 +38,13 @@ export default function EnvelopesPage() {
   };
 
   useEffect(() => {
-  const initializeData = async () => {
-    await fetchData();
-    envelopes.forEach((envelope) => calculateRemainingBudget(envelope));
-  };
+    const initializeData = async () => {
+      await fetchData();
+      envelopes.forEach((envelope) => calculateRemainingBudget(envelope));
+    };
 
-  initializeData();
-}, []);
+    initializeData();
+  }, []);
 
   const { expenses } = useLoaderData();
 
@@ -53,10 +54,9 @@ export default function EnvelopesPage() {
     const total = expenses
       .filter((expense) => expense.date === today)
       .reduce((total, expense) => total + expense.amount, 0);
-  
+
     return total;
   }
-  
 
   const goToDetails = (env) => {
     const name = env.title;
@@ -80,14 +80,18 @@ export default function EnvelopesPage() {
 
   const envelopeRender = (data, title) => {
     return (
-      <div>
+      <div className="envelope-container">
         <h3 className="envelope-container-title">{title}</h3>
-        <div className="envelope-container">
+        <div className="envelope-grid">
           {data.map((env) => (
             <div key={env.title}>
-              <div className="envelope" onClick={() => goToDetails(env)}>
-                <p className="font-semibold">{env.title}</p>
-                <p>
+              <div
+                className={`envelope ${env.color ? "" : "bg-pink"}`}
+                style={env.color ? { backgroundColor: env.color } : {}}
+                onClick={() => goToDetails(env)}
+              >
+                <p className="envelope-title-text">{env.title}</p>
+                <p className="envelope-body-text">
                   ${totalSpend(env)} spent from ${env.budget}
                 </p>
               </div>
@@ -106,16 +110,22 @@ export default function EnvelopesPage() {
 
       <h1 className="text-2xl font-bold text-center">Budget Overview</h1>
       <h3 className="my-4">
-        Total Daily Spending: ${calculateTotalSpentToday(expenses)}
+        Total Daily Spending: ${calculateTotalSpentToday(expenses).toFixed(2)}
       </h3>
-      <button className="button" onClick={() => setEnvelopeModalVisible(true)}>
-        Add Envelope
-      </button>
 
-      <main className="w-11/12 border border-gray-200 mx-auto mt-6 grid grid-rows-2">
-        <div className="w-1/2">
+      <main className="w-11/12 border border-gray-200 mx-auto mt-6 p-3">
+        <div className="max-w-xl mx-auto my-10">
+          <PieChart envelopeData={envelopes} />
+        </div>
+        <div className="text-center">
           <div>{envelopeRender(fixedEnvelopes, "Fixed")}</div>
           <div>{envelopeRender(variableEnvelopes, "Variable")}</div>
+          <button
+            className="button"
+            onClick={() => setEnvelopeModalVisible(true)}
+          >
+            Add Envelope
+          </button>
         </div>
       </main>
     </Layout>

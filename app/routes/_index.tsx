@@ -1,7 +1,6 @@
 import type { MetaFunction } from "@remix-run/node";
 import Layout from "~/components/ui/Layout";
 import {
-  calculateTotal,
   getMonthlyExpenditureDetails,
 } from "~/utils/expenses";
 import {
@@ -11,7 +10,6 @@ import {
   getLocalIncome,
   Income,
 } from "~/utils/localStorage";
-import { Doughnut } from "react-chartjs-2";
 import { useEffect, useRef, useState } from "react";
 import Chart from "chart.js/auto";
 
@@ -28,12 +26,12 @@ export default function Index() {
   const [summary, setSummary] = useState({
     incomeTotals: 0,
     expenseTotals: 0,
-    savings: 0,
+    difference: 0,
   });
   const [spendingDetails, setSpendingDetails] = useState({
     highestEnvelope: '',
     highestAmount: 0,
-    frequentEnvelope: '',
+    frequentLocation: '',
   });
 
   const chartRef = useRef<Chart | null>(null);
@@ -48,8 +46,13 @@ export default function Index() {
       setSummary({
         incomeTotals: details.incomeTotals || 0,
         expenseTotals: details.expenseTotals || 0,
-        savings: (details.incomeTotals || 0) - (details.expenseTotals || 0),
+        difference: (details.incomeTotals || 0) - (details.expenseTotals || 0),
       });
+      setSpendingDetails({
+        highestEnvelope: details.highestEnvelope || 'n/a',
+    highestAmount: details.highestSpendingAmount || 0,
+    frequentLocation: details.highestSpendingLocation || 'n/a',
+      })
     };
 
     fetchData();
@@ -65,16 +68,16 @@ export default function Index() {
       chartRef.current = new Chart(ctx, {
         type: "doughnut",
         data: {
-          labels: ["Income", "Expenses", "Savings"],
+          labels: ["Income", "Expenses", "Remainder"],
           datasets: [
             {
               data: [
                 summary.incomeTotals,
                 summary.expenseTotals,
-                summary.savings,
+                summary.difference,
               ],
-              backgroundColor: ["#4CAF50", "#FF5722", "#2196F3"],
-              hoverBackgroundColor: ["#45A049", "#E64A19", "#1976D2"],
+              backgroundColor: ["#86bd75", "#DB6A6A", "#E4C04C"],
+              hoverBackgroundColor: ["#45A049", "#E64A19", "#bdb775"],
               borderWidth: 1,
             },
           ],
@@ -93,11 +96,17 @@ export default function Index() {
     }
   }, [summary]);
 
+  const savingsMessage =
+  summary.difference > 0
+    ? `🎉 Wow, you saved a lot of money this month! You still have $${summary.difference.toFixed(2)} left over after paying the month's debts.`
+
+    : `😞 This month wasn't too good budget-wise. It looks like ${spendingDetails.frequentLocation} really got to you - you spent a total of $${spendingDetails.highestAmount} there this month.`;
+
   return (
     <Layout>
       <div>
-        <h1 className="my-5">Your Month - at a glance</h1>
-        <table className="comparison-table">
+        <h1 className="my-5 text-center">Your "At a Glance"</h1>
+        <table className="comparison-table text-center mx-auto">
           <thead>
             <tr>
               <th className="positive-item">Income</th>
@@ -109,12 +118,12 @@ export default function Index() {
             <tr>
               <td>${summary.incomeTotals.toFixed(2)}</td>
               <td>${summary.expenseTotals.toFixed(2)}</td>
-              <td>${summary.savings.toFixed(2)}</td>
+              <td>${summary.difference.toFixed(2)}</td>
             </tr>
           </tbody>
         </table>
-        <div>
-
+        <div className="m-6">
+          {savingsMessage}
         </div>
         <div className="chart-container mt-6">
           <canvas id="doughnutChart" />

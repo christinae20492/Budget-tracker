@@ -35,9 +35,9 @@ export default function YearlySummary() {
         <h3 className="text-gray-400"><button onClick={() => setYear(year + 1)}>Next Year</button></h3>
       </div>
       <div>
-        <p>Total Income: ${summary.incomeTotals}</p>
-        <p>Total Spending: ${summary.expenseTotals}</p>
-        <p>Net Savings: ${summary.spendingDifference}</p>
+        <p>Total Income: ${summary.incomeTotals.toFixed(2)}</p>
+        <p>Total Spending: ${summary.expenseTotals.toFixed(2)}</p>
+        <p>Net Savings: ${summary.spendingDifference.toFixed(2)}</p>
       </div>
       <p>
         Category with Highest Spending: {summary.highestEnvelope} - $

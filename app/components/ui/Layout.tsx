@@ -1,4 +1,5 @@
 import React from "react";
+import { applySavedTheme } from "~/utils/theme";
 import FloatingMenu from "./FloatingMenu";
 
 interface LayoutProps {
@@ -6,12 +7,15 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
+
+  applySavedTheme();
+
   return (
-    <div>
+    <div id="layout">
       <header>
         <FloatingMenu />
       </header>
-      <main className="p-6 border border-gray-500 rounded-lg shadow-md mt-4 min-h-lvh max-w-screen-2xl mx-auto bg-white">
+      <main className="main-container">
         {children}
       </main>
     </div>

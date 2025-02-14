@@ -12,6 +12,8 @@ import {
   Expense,
   getLocalIncome,
   Income,
+  getEnvelopes,
+  Envelope,
 } from "~/utils/localStorage";
 import ToggleSwitch from "~/components/ui/ToggleSwitch";
 
@@ -36,15 +38,17 @@ export default function ExpenseCalendar() {
   const [selectedDate, setSelectedDate] = useState("");
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [incomes, setIncomes] = useState<Income[]>([]);
+  const [envelopes, setEnvelopes] = useState<Envelope[]>([]);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const storedExpenses = getLocalExpenses();
     const storedIncomes = getLocalIncome();
+    const storedEnvelopes = getEnvelopes();
     setExpenses(storedExpenses);
     setIncomes(storedIncomes);
-    console.log(incomes);
+    setEnvelopes(storedEnvelopes);
   }, []);
 
   useEffect(() => {
@@ -86,14 +90,9 @@ export default function ExpenseCalendar() {
     navigate(`/calendar/${selectedDate}`);
   };
 
-  const getCategoryColor = (envelope) => {
-    const colors = {
-      Groceries: "#79FC5F",
-      "Personal care": "#E2EAF4",
-      "Eating Out": "#894F32",
-      Entertainment: "#CAA927",
-    };
-    return colors[envelope] || "#5F5D5D"; // default color
+  const getCategoryColor = (envelopeName, envelopes) => {
+    const envelope = envelopes.find((env) => env.title === envelopeName);
+    return envelope?.color || "#DA5151";
   };
 
   const calendarEvents = useMemo(() => {
@@ -102,14 +101,14 @@ export default function ExpenseCalendar() {
         id: expense.id,
         title: `${expense.location} - $${expense.amount}`,
         start: expense.date,
-        backgroundColor: getCategoryColor(expense.envelope),
+        backgroundColor: getCategoryColor(expense.envelope, envelopes),
       }));
     } else if (view === "income") {
       return incomes.map((income) => ({
         id: income.id,
         title: `${income.source} - $${income.amount}`,
         start: income.date,
-        backgroundColor: "#7DDA58",
+        backgroundColor: "#4DB533",
       }));
     } else {
       return [
@@ -117,13 +116,13 @@ export default function ExpenseCalendar() {
           id: expense.id,
           title: `${expense.location} - $${expense.amount}`,
           start: expense.date,
-          backgroundColor: getCategoryColor(expense.envelope),
+          backgroundColor: getCategoryColor(expense.envelope, envelopes),
         })),
         ...incomes.map((income) => ({
           id: income.id,
           title: `${income.source} - $${income.amount}`,
           start: income.date,
-          backgroundColor: "#7DDA58",
+          backgroundColor: "#4DB533",
         })),
       ];
     }

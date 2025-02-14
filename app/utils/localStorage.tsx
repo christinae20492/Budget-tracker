@@ -74,6 +74,8 @@ export interface Envelope {
   budget?: number;
   expenses: Expense[];
   icon: string;
+  color: string;
+  comments?: string;
 }
 
 export function getEnvelopes(): Envelope[] {
@@ -92,6 +94,20 @@ export const deleteExpense = async (id) => {
   const expenses = getLocalExpenses();
   const updatedExpenses = expenses.filter((exp) => exp.id !== id);
   localStorage.setItem("expenses", JSON.stringify(updatedExpenses));
+
+  const envelopes = JSON.parse(localStorage.getItem("envelopes") || "[]");
+  const updatedEnvelopes = envelopes.map((envelope) => ({
+    ...envelope,
+    expenses: envelope.expenses.filter((expenseId) => expenseId !== id),
+  }));
+  localStorage.setItem("envelopes", JSON.stringify(updatedEnvelopes));
+};
+
+
+export const deleteEnvelope = async (title) => {
+  const envelopes = getEnvelopes();
+  const updatedEnvelopes = envelopes.filter((env) => env.title !==title);
+  localStorage.setItem("envelopes", JSON.stringify(updatedEnvelopes));
 };
 
 export const deleteIncome = async (id) => {
